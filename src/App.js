@@ -1,24 +1,29 @@
-import logo from './logo.svg';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+
+// Styles
+import "react-datepicker/dist/react-datepicker.css";
 import './App.css';
+
+// Components
+import CreateUser from './components/CreateUser';
+import ShowUserDetails from './components/ShowUserDetails';
+import ShowUserList from './components/ShowUserList';
+import UpdateUserInfo from './components/UpdateUserInfo';
+import Navbar from './components/Navbar';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Navbar />
+      <div className="max-w-3xl m-auto">
+        <Routes>
+          <Route exact path='/' element={<ShowUserList />} />
+          <Route path='/create-user' element={<CreateUser />} />
+          <Route path='/user-details/:id' element={<ShowUserDetails />} />
+          <Route path='/update-user/:id' element={<UpdateUserInfo />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
