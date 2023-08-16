@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { createPortal } from 'react-dom';
+import { createPortal } from "react-dom";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { API_URL } from "../../utils/consts";
 import axios from "axios";
@@ -28,6 +28,7 @@ const ShowUserDetails = () => {
   }, [id]);
 
   const onDeleteClick = (id) => {
+    setShowModal(false);
     axios
       .delete(`${API_URL}/${id}`)
       .then((res) => {
@@ -61,13 +62,11 @@ const ShowUserDetails = () => {
           </p>
           <p className="text-center sm:text-left capitalize mb-4">
             <span className="font-bold">Join date: </span>
-            {moment(user.joinDate).format('MM/DD/YYYY')}
+            {moment(user.joinDate).format("MM/DD/YYYY")}
           </p>
           <div className="flex justify-center gap-3">
             <button
-              onClick={() => {
-                onDeleteClick(user._id);
-              }}
+              onClick={() => setShowModal(true)}
               className="rounded bg-red-500 block text-white py-2 w-28 text-sm text-center cursor-pointer"
             >
               Delete user
@@ -81,10 +80,31 @@ const ShowUserDetails = () => {
           </div>
         </div>
       </div>
-      {showModal && createPortal(
-        <Modal onClose={() => setShowModal(false)} />,
-        document.body
-      )}
+      {showModal &&
+        createPortal(
+          <Modal onClose={() => setShowModal(false)}>
+            <div className="flex flex-col">
+              <button onClick={() => setShowModal(false)} className="absolute top-2 right-2 hover:bg-slate-100-">
+              <i className="fa fa-times text-gray-400" aria-hidden="true"></i>
+              </button>
+              <h3 className="text-gray-800 mt-4">Are you sure you want to delete this user?</h3>
+              <div className="flex justify-center gap-2 mt-5">
+                <button
+                  onClick={() => {
+                    onDeleteClick(user._id);
+                  }}
+                  className="rounded bg-red-500 block text-white py-2 w-28 text-sm text-center cursor-pointer"
+                >
+                  Yes, delete it
+                </button>
+                <button onClick={() => setShowModal(false)} className="rounded bg-indigo-500 block text-white py-2 w-28 text-sm text-center cursor-pointer">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </Modal>,
+          document.body
+        )}
     </div>
   );
 };
