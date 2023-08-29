@@ -1,25 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { API_URL } from "../../utils/consts";
-import axios from "axios";
+
+// redux
+import { useSelector, useDispatch } from "react-redux";
+import { getUsersAction } from "../../redux/userSlice";
 
 // Components
 import UserCard from "../UserCard";
 
 const ShowUserList = () => {
-  const [users, setUsers] = useState([]);
+  const dispatch = useDispatch();
+
+  const users = useSelector((state) => state.user.users);
 
   useEffect(() => {
-    axios
-      .get(API_URL)
-      .then((res) => {
-        setUsers(res.data);
-      })
-      .catch((err) => {
-        console.log("Error from ShowUserskList");
-      });
-  }, []);
-  
+    dispatch(getUsersAction());
+  }, [dispatch]);
+
   return (
     <div className="mt-12 px-3 md:px-1">
       <Link

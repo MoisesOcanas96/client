@@ -1,42 +1,33 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { API_URL } from "../../utils/consts";
-import axios from "axios";
 import moment from "moment";
 import avatar from "../UserCard/avatar.png";
+
+// redux
+import { useSelector, useDispatch } from "react-redux";
+import { getUserAction, deleteUserAction } from "../../redux/userSlice";
 
 // Components
 import Modal from "../Modal";
 
 const ShowUserDetails = () => {
-  const [user, setUser] = useState({});
   const [showModal, setShowModal] = useState(false);
+  const user = useSelector((state) => state.user);
 
   const { id } = useParams();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios
-      .get(`${API_URL}/${id}`)
-      .then((res) => {
-        setUser(res.data);
-      })
-      .catch((err) => {
-        console.log("Error from ShowUserDetails");
-      });
+    dispatch(getUserAction(id));
   }, [id]);
 
   const onDeleteClick = (id) => {
     setShowModal(false);
-    axios
-      .delete(`${API_URL}/${id}`)
-      .then((res) => {
-        navigate("/");
-      })
-      .catch((err) => {
-        console.log("Error form ShowUserDetails_deleteClick");
-      });
+    if (!id) return;
+    dispatch(deleteUserAction(id));
+    navigate("/");
   };
 
   return (
@@ -84,10 +75,15 @@ const ShowUserDetails = () => {
         createPortal(
           <Modal onClose={() => setShowModal(false)}>
             <div className="flex flex-col">
-              <button onClick={() => setShowModal(false)} className="absolute top-2 right-2 hover:bg-slate-100-">
-              <i className="fa fa-times text-gray-400" aria-hidden="true"></i>
+              <button
+                onClick={() => setShowModal(false)}
+                className="absolute top-2 right-2 hover:bg-slate-100-"
+              >
+                <i className="fa fa-times text-gray-400" aria-hidden="true"></i>
               </button>
-              <h3 className="text-gray-800 mt-4">Are you sure you want to delete this user?</h3>
+              <h3 className="text-gray-800 mt-4">
+                Are you sure you want to delete this user?
+              </h3>
               <div className="flex justify-center gap-2 mt-5">
                 <button
                   onClick={() => {
@@ -97,7 +93,10 @@ const ShowUserDetails = () => {
                 >
                   Yes, delete it
                 </button>
-                <button onClick={() => setShowModal(false)} className="rounded bg-indigo-500 block text-white py-2 w-28 text-sm text-center cursor-pointer">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="rounded bg-indigo-500 block text-white py-2 w-28 text-sm text-center cursor-pointer"
+                >
                   Cancel
                 </button>
               </div>

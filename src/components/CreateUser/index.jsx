@@ -1,36 +1,31 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { API_URL, USER_DEFAULT_INFO, USER_TYPES } from "../../utils/consts";
+import { USER_TYPES } from "../../utils/consts";
 import DatePicker from "react-datepicker";
-import axios from "axios";
+
+// redux
+import { useSelector, useDispatch } from "react-redux";
+import { setUser, setDate, postUserAction } from "../../redux/userSlice";
 
 const CreateUser = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(USER_DEFAULT_INFO);
+  const dispatch = useDispatch();
 
-  const onChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
-  };
+  const user = useSelector((state) => state.user.user);
+
+  const onChange = (e) => dispatch(setUser(e.target.value));
 
   const onChangeDate = (date) => {
     const newDate = date.toString();
-    console.log('date', newDate)
-    setUser({ ...user, joinDate: date });
+    dispatch(setDate(newDate));
   };
 
   const onSubmit = (e) => {
     e.preventDefault();
-    console.log("user", user);
 
-    axios
-      .post(`${API_URL}/`, user)
-      .then(() => {
-        setUser(USER_DEFAULT_INFO);
-        navigate("/");
-      })
-      .catch((err) => {
-        console.log("Error in CreateUser!");
-      });
+    if(!user) return;
+    dispatch(postUserAction(user));
+    navigate("/");
   };
 
   return (

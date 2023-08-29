@@ -1,51 +1,36 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { API_URL, USER_DEFAULT_INFO, USER_TYPES } from "../../utils/consts";
+import { USER_TYPES } from "../../utils/consts";
 import DatePicker from "react-datepicker";
-import axios from "axios";
+
+// redux
+import { useSelector, useDispatch } from "react-redux";
+import { setUser, setDate, getUserAction, editUserAction } from "../../redux/userSlice";
 
 const ShowUserDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [user, setUser] = useState(USER_DEFAULT_INFO);
+  const dispatch = useDispatch();
+
+  const user = useSelector((state) => state.user);
 
   useEffect(() => {
-    axios
-      .get(`${API_URL}/${id}`)
-      .then((res) => {
-        setUser({
-          name: res.data.name,
-          age: res.data.age,
-          email: res.data.email,
-          userType: res.data.userType,
-          joinDate: res.data.joinDate,
-        });
-      })
-      .catch((err) => {
-        console.log("Error in UpdateUser!");
-      });
+    dispatch(getUserAction(id));
   }, [id]);
 
-  const onChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
-  };
+  const onChange = (e) => dispatch(setUser(e.target.value));
 
   const onChangeDate = (date) => {
     const newDate = date.toString();
-    console.log('date', newDate)
-    setUser({ ...user, joinDate: date });
+    dispatch(setDate(newDate));
   };
 
   const onSubmit = (e) => {
     e.preventDefault();
-    axios
-    .put(`${API_URL}/${id}`, user)
-      .then((res) => {
-        navigate(`/user-details/${id}`);
-      })
-      .catch((err) => {
-        console.log('Error in UpdateBookInfo!');
-      });
+    if(!user) return;
+    
+    dispatch(editUserAction(user, id));
+    navigate(`/user-details/${id}`)
   };
 
   return (
